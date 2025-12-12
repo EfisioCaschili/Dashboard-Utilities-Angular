@@ -1,0 +1,157 @@
+<h2>Simulation Dashboard</h2>
+
+<div class="input-container">
+
+<label for="mode">Select the mode:</label>
+<select id="mode" [(ngModel)]="selectedMode" name="mode">
+  <option *ngFor="let m of modes" [value]="m">{{ m }}</option>
+</select>
+
+<div *ngIf="selectedMode === 'day'" class="field-group">
+  <div class ="date-inputs">
+    <label>Day Start:</label>
+    <input type="date" [(ngModel)]="startDate" name="startDate">
+  </div>
+  <div class ="date-inputs">
+    <label>Day End:</label>
+    <input type="date" [(ngModel)]="endDate" name="endDate" [min]="startDate">
+  </div>
+</div>
+
+
+<div *ngIf="selectedMode === 'week'" class="field-group">
+  <div class ="date-inputs">
+    <label>Week Start:</label>
+    <input type="number" min="1" max="52" [(ngModel)]="startWeek" name="startWeek">
+  </div>
+  <div class ="date-inputs">
+    <label>Week End:</label>
+    <input type="number" min="1" max="52" [(ngModel)]="endWeek" name="endWeek" [min]="startWeek">
+  </div>
+</div>
+
+<div *ngIf="selectedMode === 'month'" class="field-group">
+  <label>Month Start:</label>
+  <select [(ngModel)]="startMonth" name="startMonth">
+    <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="m">{{ m }}</option>
+  </select>
+
+  <label>Month End:</label>
+  <select [(ngModel)]="endMonth" name="endMonth">
+    <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="m" [disabled]="m < startMonth">{{ m }}</option>
+  </select>
+</div>
+
+<div *ngIf="selectedMode === 'year'" class="field-group">
+  <label>Year Start:</label>
+  <input type="number" min="2022" max="2100" [(ngModel)]="startYear" name="startYear">
+
+  <label>Year End:</label>
+  <input type="number" min="2022" max="2100" [(ngModel)]="endYear" name="endYear" [min]="startYear">
+</div>
+
+<button (click)="sendParams()" [disabled]="loading">
+  {{ loading ? "Processing..." : "Show Data" }}
+</button>
+
+
+<div class="results-wrapper" *ngIf="groupedByWeek && getKeys(groupedByWeek).length > 0">
+<h1>Overview</h1>
+
+<div *ngFor="let week of getKeys(groupedByWeek)" class="week-row">
+
+  <!-- colonna unica con le etichette -->
+  <div class="header-column">
+    <table class="result-table">
+      <tbody>   
+        <tr><td class="header-label">Session Completed (DCO)</td></tr>
+        <tr><td class="header-label">Support Completed (SDC)</td></tr>
+        <tr><td class="header-label">Session Didn't Complete (DNCO)</td></tr>
+        <tr><td class="header-label">Session Cancelled (CANC)</td></tr>
+        <tr><td class="header-label">Rescheduled (RSLD)</td></tr>
+        <tr><td class="header-label">Support Didn't Complete (SDNC)</td></tr>
+        <tr><td class="header-label">Support Cancelled (SMC)</td></tr>
+        <tr><td class="header-label">Error on DFS (ERR)</td></tr>
+      </tbody>
+    </table>
+    <table class="result-table">
+      <tbody>   
+        <tr><td class="header-label">Notes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- tabelle di ogni giorno -->
+  <div *ngFor="let entry of groupedByWeek[week]" class="table-container">
+
+    <h3>
+      {{ week === 'NO_WEEK'
+          ? 'Week ' + entry.date
+          : entry.date + ' (week ' + week + ')' }}
+    </h3>
+
+    <table class="result-table">
+      <tbody>
+        <tr>
+          <td *ngFor="let device of getKeys(entry.data)">
+            {{device}}
+          </td>
+        </tr>
+        <tr>
+          <td *ngFor="let device of getKeys(entry.data)">
+            {{ entry.data[device].DCO }}
+          </td>
+        </tr>
+        <tr>
+          <td *ngFor="let device of getKeys(entry.data)">
+            {{ entry.data[device].SDC }}
+          </td>
+        </tr>
+        <tr>
+          <td *ngFor="let device of getKeys(entry.data)">
+            {{ entry.data[device].DNCO }}
+          </td>
+        </tr>
+        <tr>
+          <td *ngFor="let device of getKeys(entry.data)">
+            {{ entry.data[device].CANC }}
+          </td>
+        </tr>
+        <tr>
+          <td *ngFor="let device of getKeys(entry.data)">
+            {{ entry.data[device].RSLD }}
+          </td>
+        </tr>
+        <tr>
+          <td *ngFor="let device of getKeys(entry.data)">
+            {{ entry.data[device].SDNC }}
+          </td>
+        </tr>
+        <tr>
+          <td *ngFor="let device of getKeys(entry.data)">
+            {{ entry.data[device].SMC }}
+          </td>
+        </tr>
+        <tr>
+          <td *ngFor="let device of getKeys(entry.data)">
+            {{ entry.data[device].ERR }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="result-table">
+      <tbody *ngFor="let device of getKeys(entry.data)"> 
+        <tr *ngFor="let i of entry.data[device].IP; let idx = index">
+          <td>{{ device }}</td>
+          <td>{{ entry.data[device].IP[idx] }}</td>
+          <td>{{ entry.data[device].SimTech[idx] }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+</div>

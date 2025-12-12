@@ -1,0 +1,35 @@
+
+
+
+<nav class="navbar">
+  <div class="nav-left">
+    <img src="assets/logo.png" alt="Logo" class="logo">
+   <span class="material-icons">flight_takeoff</span>
+    <span class="brand">GBTS</span>
+  </div>
+
+  <ul class="menu" [class.open]="menuOpen">
+    <li>
+      <a [routerLink]="['/home']">
+        <span class="material-icons">home</span>
+        Home
+      </a>
+    </li>
+    
+    <li>
+      <a [routerLink]="['/dashboard1']">
+        <span class="material-icons">dashboard</span>
+        Utilities
+      </a>
+    </li>
+
+    <li>
+      <a [routerLink]="['/sim-dashboard']">
+        <span class="material-icons">view_list</span>
+        Simulators
+      </a>
+    </li>
+  </ul>
+
+  <span class="material-icons menu-toggle" (click)="toggleMenu()">menu</span>
+</nav>

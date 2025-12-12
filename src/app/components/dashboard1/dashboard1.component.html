@@ -1,0 +1,85 @@
+<!-- 
+<h1>Dashboard Utilities</h1>
+
+<div>
+  <label>Choose the script:</label>
+  <select [(ngModel)]="selectedScript">
+    <option value="Create_PDF_Report/main.py">Daily Report</option>
+    <option value="Overview SlotMeeting/app.py">Overview Slot Meeting</option>
+    <option value="WEEKLY REPORT/main.py">Weekly Report</option>
+    <option value="Check Logbook SH/Check.py">Check Logbooks</option>
+  </select>
+</div>
+
+<div *ngIf="selectedScript === 'Create_PDF_Report/main.py'">
+  <input type="date" [(ngModel)]="today">
+  <input type="date" [(ngModel)]="tomorrow">
+</div>
+
+<div *ngIf="selectedScript === 'WEEKLY REPORT/main.py'">
+  <input type="number" [(ngModel)]="year" min="2000" max="2100">
+  <input type="number" [(ngModel)]="week" min="1" max="52">
+</div>
+
+<button (click)="runScript()">Execute</button>
+
+<h3>Output:</h3>
+<pre>{{ output }}</pre>
+
+-->
+<nav class="navbar">
+  <div class="nav-left">
+    <span class="nav-title">Dashboard Utilities</span>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Run Script</h2>
+
+    <!-- SCRIPT SELECTOR -->
+    <div class="form-group">
+      <label>Choose the script:</label>
+      <select [(ngModel)]="selectedScript">
+        <option value="Create_PDF_Report/main.py">Daily Report</option>
+        <option value="Overview SlotMeeting/app.py">Overview Slot Meeting</option>
+        <option value="WEEKLY REPORT/main.py">Weekly Report</option>
+        <option value="Check Logbook SH/Check.py">Check Logbooks</option>
+      </select>
+    </div>
+
+    <!-- DAILY REPORT -->
+    <div *ngIf="selectedScript === 'Create_PDF_Report/main.py'" class="form-group dual">
+      <div>
+        <label>Today</label>
+        <input type="date" [(ngModel)]="today">
+      </div>
+      <div>
+        <label>Tomorrow</label>
+        <input type="date" [(ngModel)]="tomorrow">
+      </div>
+    </div>
+
+    <!-- WEEKLY REPORT -->
+    <div *ngIf="selectedScript === 'WEEKLY REPORT/main.py'" class="form-group dual">
+      <div>
+        <label>Year</label>
+        <input type="number" [(ngModel)]="year" min="2000" max="2100">
+      </div>
+      <div>
+        <label>Week</label>
+        <input type="number" [(ngModel)]="week" min="1" max="52">
+      </div>
+    </div>
+
+    <button class="btn" (click)="runScript()">Execute</button>
+  </div>
+
+  <div class="card output">
+    <h3>Output</h3>
+    <pre>{{ output }}</pre>
+  </div>
+
+</div>
+
