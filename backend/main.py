@@ -12,10 +12,12 @@ if BASE_DIR not in sys.path:
 env = dotenv_values(os.path.join(BASE_DIR, "env.env"))
 source = env.get('source')
 python_path = env.get('python_path')
+nas_path = env.get('nas_path')
 
 app = Flask(__name__, static_folder="../frontend/dist/frontend", static_url_path="")
 CORS(app,
-     resources={r"/api/*": {"origins": "http://localhost:4200"}},
+     resources={r"/api/*": {"origins": "http://localhost:4200"},
+                r"/run_script": {"origins": "http://localhost:4200"}},
      methods=["GET", "POST", "OPTIONS"],
      allow_headers=["Content-Type"],
      supports_credentials=True
@@ -57,8 +59,7 @@ def run_script():
     os.system(r'net use Z: /delete /y')
 
     # mappa correttamente
-    rc = os.system(r'net use Z: "\\192.168.1.125\gbts" /persistent:no')
-
+    rc = os.system(r'net use Z: "\\192.168.1.125\gbts" /persistent:no') 
     if rc != 0:
         return jsonify({"error": "Impossible mounting Z: on share"}), 500
 

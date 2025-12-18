@@ -4,6 +4,7 @@ from dotenv import dotenv_values
 from flask import jsonify
 from .Data import Data
 from .Report import Day, Week
+import pandas as pd
 
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -17,7 +18,7 @@ client_id = env.get('client_id')
 shared_secret = env.get('shared_secret')
 tenant_id = env.get('tenant_id')
 
-def load_logbook():
+def load_logbook(file_name: str = "Record.xlsm"):
     """Scarica il file da SharePoint e carica il logbook."""
 
     local_path = os.getcwd() + "/"
@@ -27,18 +28,27 @@ def load_logbook():
     data_container.download_from_sharepoint(
         site_url_path,
         logbooksh_url_path,
-        local_path + "Record.xlsm",
+        local_path + file_name,
         client_id,
         shared_secret,
         tenant_id
     )
 
     lgbk = data_container.load_file(
-        local_path + "Record.xlsm",
+        local_path + file_name,
         "Log Book"
     )
 
-    return lgbk
+    status = data_container.load_file(
+        local_path + file_name,
+        "StatusByDay"
+    )
+
+     
+    return {
+        "logbook": lgbk,
+        "status": status
+    }
 
 
 def convert_to_serializable(obj):
@@ -52,10 +62,12 @@ def convert_to_serializable(obj):
         return convert_to_serializable(obj.__dict__)
     return str(obj)
 
+
+
 def run(mode: str, value: dict):
 
-    lgbk = load_logbook()
-    #print("parameters received - mode:", mode, ", value:", value)
+    logbook_output = load_logbook()
+    lgbk = logbook_output["logbook"]
     output = {}
     if mode == "day":
         d = datetime.strptime(value['start'], "%Y-%m-%d")
@@ -66,8 +78,8 @@ def run(mode: str, value: dict):
             day_instance = Day(date(d.year, d.month, d.day), lgbk)
             output[str(d.date())] =  convert_to_serializable(day_instance.get_outcomes())
             d += timedelta(days=1)  
+        
         #print("OUTPUT DAY:", output)
-        return output
 
     elif mode == "week":
         week_start = int(value['start'])
@@ -75,14 +87,31 @@ def run(mode: str, value: dict):
             week_instance = Week(week_start, lgbk)
             output[str(week_start)] =  convert_to_serializable(week_instance.get_outcomes())
             week_start += 1
-        return output
         
 
     elif mode == "month":
-        return {"error": "month not implemented"}
+        month_start = int(value['start'])
+        while month_start <= int(value['end']):
+            month_instance = Week(month_start, lgbk)
+            output[str(month_start)] =  convert_to_serializable(month_instance.get_outcomes())
+            month_start += 1
+        
 
     elif mode == "year":
-        return {"error": "year not implemented"}
+        year_start = int(value['start'])
+        while year_start <= int(value['end']):
+            year_instance = Week(year_start, lgbk)
+            output[str(year_start)] =  convert_to_serializable(year_instance.get_outcomes())
+            year_start += 1
+    return output
 
-    else:
-        return {"error": "invalid mode"}
+    
+def run_status():
+
+    logbook_output = load_logbook()
+    status = logbook_output["status"]
+    
+    today_date = datetime.today().date()
+    status = status[status.iloc[:,4] == pd.to_datetime(today_date,format="%Y-%m-%d")]
+    status = status.to_dict(orient='records')
+    return status

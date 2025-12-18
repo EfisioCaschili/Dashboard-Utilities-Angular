@@ -22,17 +22,30 @@ class Day():
             outcomes[sim]['SDNC'] = (sim_data.iloc[:,71] == 'SDNC').sum()
             outcomes[sim]['SMC'] = (sim_data.iloc[:,71] == 'SMC').sum()
             outcomes[sim]['ERR'] = (sim_data.iloc[:,71] == 'ERR').sum()
-            #outcomes[sim]['Notes'] = ("IP: " + sim_data.iloc[:, 24].fillna('') + "<BR>SimTech:" + sim_data.iloc[:, 63].fillna('')).str.strip().tolist()
+            dco = (sim_data.iloc[:, 71] == 'DCO').sum()
+            sdc = (sim_data.iloc[:, 71] == 'SDC').sum()
+            cd3 = (sim_data.iloc[:, 72] == 'CD3').sum()
+            cd4 = (sim_data.iloc[:, 72] == 'CD4').sum()
+            numerator = dco + sdc
+            denominator = dco + sdc + cd3 + cd4
+            outcomes[sim]['KPI'] = (numerator / denominator) if denominator > 0 else 0
+            
+
             ip_col = sim_data.iloc[:, 24].fillna('').astype(str).str.strip()
             simtech_col = sim_data.iloc[:, 63].fillna('').astype(str).str.strip()
-
+            outcome_col = sim_data.iloc[:, 71].fillna('').astype(str).str.strip()
+            
             # IP: scrivi solo se il campo non è vuoto
             outcomes[sim]['IP'] = []
             outcomes[sim]['SimTech'] = []
-            ip_col = ip_col[ip_col != '']
+            outcomes[sim]['outcome'] = []
+            
+            #ip_col = ip_col[ip_col != '']
             outcomes[sim]['IP'].extend(ip_col.tolist())
-            simtech_col = simtech_col[simtech_col != '']
+            #simtech_col = simtech_col[simtech_col != '']
             outcomes[sim]['SimTech'].extend(simtech_col.tolist())
+            outcomes[sim]['outcome'].extend(outcome_col.tolist())
+            
         
         return outcomes
 
@@ -42,5 +55,17 @@ class Week(Day):
         self.simulators = ['FMS1', 'FMS2', 'PTT1', 'PTT2', 'PTT3','ULTD1','ULTD2','LVC']
         #super().__init__(day=None, lgbk_data=lgbk_data)
         self.lgbk_data = lgbk_data[lgbk_data.iloc[:,2]== self.week]
+
+class Month(Day):
+    def __init__(self, month: int, lgbk_data: pd.DataFrame):
+        self.month = month
+        self.simulators = ['FMS1', 'FMS2', 'PTT1', 'PTT2', 'PTT3','ULTD1','ULTD2','LVC']
+        self.lgbk_data = lgbk_data[pd.to_datetime(lgbk_data.iloc[:,1],format="%Y-%m-%d").dt.month== self.month]
+
+class Year(Day):
+    def __init__(self, year: int, lgbk_data: pd.DataFrame):
+        self.year = year
+        self.simulators = ['FMS1', 'FMS2', 'PTT1', 'PTT2', 'PTT3','ULTD1','ULTD2','LVC']
+        self.lgbk_data = lgbk_data[pd.to_datetime(lgbk_data.iloc[:,1],format="%Y-%m-%d").dt.year== self.year]
         
         
