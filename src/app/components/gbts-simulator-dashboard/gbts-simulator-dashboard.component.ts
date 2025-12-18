@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
+
 
 @Component({
   selector: 'app-sim-dashboard',
@@ -17,6 +19,7 @@ export class SimDashboardComponent {
   year: number = 2025;
   week: number = 1;
   month: number = 1;
+  type: string = 'Day';
 
   output: any = null;
   groupedByWeek: any = {};
@@ -24,6 +27,9 @@ export class SimDashboardComponent {
   modes = ['day', 'week', 'month', 'year'];
   selectedMode = 'day';
 
+  selectedRows: { ip: string; simtech: string; outcome: string }[] = [];
+  selectedDevice: string | null = null;
+  showNotesPopup = false;
 
   startDate = '';
   endDate = '';
@@ -88,6 +94,33 @@ export class SimDashboardComponent {
     console.log('Grouped by week:', this.groupedByWeek);
   }
 
+
+  openNotes(entry: any, device: string): void {
+      const ips: string[] = entry.data[device]?.IP || [];
+      const simtechs: string[] = entry.data[device]?.SimTech || [];
+      const outcomes: string[] = entry.data[device]?.outcome || [];
+      
+
+      this.selectedRows = ips.map((ip, index) => ({
+        ip,
+        simtech: simtechs[index] ?? '',
+        outcome: outcomes[index] ?? ''
+        }));
+
+      if (this.selectedRows.length === 0) {
+        return;
+      }
+
+      this.selectedDevice = device;
+      this.showNotesPopup = true;
+}
+
+closeNotes(): void {
+      this.showNotesPopup = false;
+      this.selectedRows = [];
+      this.selectedDevice = null;
+}
+
   sendParams() {
     this.loading = true;
     
@@ -102,16 +135,20 @@ export class SimDashboardComponent {
     else if (this.selectedMode === 'week') {
       params.start = this.startWeek;
       params.end = this.endWeek;
+      this.type = 'Week';
+
     }
 
     else if (this.selectedMode === 'month') {
       params.start = this.startMonth;
       params.end = this.endMonth;
+      this.type = 'Month';
     }
 
     else if (this.selectedMode === 'year') {
       params.start = this.startYear;
       params.end = this.endYear;
+      this.type = 'Year';
     }
 
     this.http.post('http://127.0.0.1:5000/api/sim_dashboard', params, {

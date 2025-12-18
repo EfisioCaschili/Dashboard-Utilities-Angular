@@ -14,7 +14,7 @@
   </div>
   <div class ="date-inputs">
     <label>Day End:</label>
-    <input type="date" [(ngModel)]="endDate" name="endDate" [min]="startDate">
+    <input class ="date-margin" type="date" [(ngModel)]="endDate" name="endDate" [min]="startDate">
   </div>
 </div>
 
@@ -26,7 +26,7 @@
   </div>
   <div class ="date-inputs">
     <label>Week End:</label>
-    <input type="number" min="1" max="52" [(ngModel)]="endWeek" name="endWeek" [min]="startWeek">
+    <input class ="date-margin" type="number" min="1" max="52" [(ngModel)]="endWeek" name="endWeek" [min]="startWeek">
   </div>
 </div>
 
@@ -74,11 +74,6 @@
         <tr><td class="header-label">Error on DFS (ERR)</td></tr>
       </tbody>
     </table>
-    <table class="result-table">
-      <tbody>   
-        <tr><td class="header-label">Notes</td></tr>
-      </tbody>
-    </table>
   </div>
 
   <!-- tabelle di ogni giorno -->
@@ -86,14 +81,17 @@
 
     <h3>
       {{ week === 'NO_WEEK'
-          ? 'Week ' + entry.date
+          ? type + ' ' + entry.date
           : entry.date + ' (week ' + week + ')' }}
     </h3>
 
     <table class="result-table">
       <tbody>
         <tr>
-          <td *ngFor="let device of getKeys(entry.data)">
+          <td *ngFor="let device of getKeys(entry.data)"
+              class="header-cell clickable"
+              (click)="openNotes(entry, device)"
+          >
             {{device}}
           </td>
         </tr>
@@ -139,17 +137,40 @@
         </tr>
       </tbody>
     </table>
+  </div>
+    
+    <div class="modal-backdrop" *ngIf="showNotesPopup" (click)="closeNotes()"></div>
 
-    <table class="result-table">
-      <tbody *ngFor="let device of getKeys(entry.data)"> 
-        <tr *ngFor="let i of entry.data[device].IP; let idx = index">
-          <td>{{ device }}</td>
-          <td>{{ entry.data[device].IP[idx] }}</td>
-          <td>{{ entry.data[device].SimTech[idx] }}</td>
+<div class="modal-backdrop" *ngIf="showNotesPopup" (click)="closeNotes()"></div>
+
+<div class="modal" *ngIf="showNotesPopup">
+  <div class="modal-header">
+    <h3>Notes – {{ selectedDevice }}</h3>
+    <button class="close-btn" (click)="closeNotes()">✕</button>
+  </div>
+
+  <div class="modal-body">
+    <table class="notes-table">
+      <thead>
+        <tr>
+          <th>Issue/Session</th>
+          <th>IP</th>
+          <th>SimTech</th>
+          <th>Outcome</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of selectedRows; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ row.ip }}</td>
+          <td>{{ row.simtech }}</td>
+          <td>{{ row.outcome }}</td>
         </tr>
       </tbody>
     </table>
   </div>
+</div>
+
 
 </div>
 
