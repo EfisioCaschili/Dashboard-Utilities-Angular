@@ -1,0 +1,30 @@
+<div class="modal-body">
+    <table class="notes-table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Slot</th>
+          <th>FMS1</th>
+          <th>FMS2</th>
+          <th>PTT1</th>
+          <th>PTT2</th>
+          <th>PTT3</th>
+          <th>ULTD1</th>
+          <th>ULTD2</th>
+        </tr>
+      </thead>
+      <tbody> 
+        <tr *ngFor="let row of output">
+          <td>{{ row['Data'] }}</td>
+          <td>{{ row['Slot'] }}</td>
+          <td *ngIf="row['FMS1']==='NOK'" style="background-color: rgb(100, 2, 0);">{{ row['FMS1'] }}</td>
+          <td >{{ row['FMS2'] }}</td>
+          <td >{{ row['PTT1'] }}</td>
+          <td >{{ row['PTT2'] }}</td>
+          <td >{{ row['PTT3'] }}</td>
+          <td >{{ row['ULTD1'] }}</td>
+          <td >{{ row['ULTD2'] }}</td>
+        </tr> 
+      </tbody> 
+    </table>
+</div>

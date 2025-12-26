@@ -139,8 +139,22 @@
     </table>
   </div>
     
-    <div class="modal-backdrop" *ngIf="showNotesPopup" (click)="closeNotes()"></div>
+<div class="flex-break"></div>
 
+<div class="header-column-recap">
+    <table class="result-table">
+      <tbody>   
+        <tr><td class="header-label">SORTIES DEMAND</td></tr>
+        <tr><td class="header-label">SORTIES CAPACITY (GBTS)</td></tr>
+        <tr><td class="header-label">SORTIES PLANNED by SLOT(DFS)</td></tr>
+        <tr><td class="header-label">SORTIES EXECUTED by GBTS</td></tr>
+        <tr><td class="header-label">SORTIES NO CARRIED OUT</td></tr>
+      </tbody>
+    </table>
+</div>
+
+  
+<div class="modal-backdrop" *ngIf="showNotesPopup" (click)="closeNotes()"></div>
 <div class="modal-backdrop" *ngIf="showNotesPopup" (click)="closeNotes()"></div>
 
 <div class="modal" *ngIf="showNotesPopup">

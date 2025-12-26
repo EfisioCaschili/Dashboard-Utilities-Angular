@@ -78,6 +78,7 @@ button:disabled {
   width: 100%;
   border-collapse: collapse;
   margin-top: 15px;
+  table-layout: fixed;
 }
 
 .results-wrapper {
@@ -107,11 +108,27 @@ button:disabled {
   display: flex;
   gap: 20px;
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .header-column {
-  flex-shrink: 0;
+  /*flex-shrink: 0;*/
    padding-top: 70px;
+   flex: 0 0 180px;
+   
+}
+
+.header-column-recap {
+  /*flex-shrink: 0;
+  padding-top: 70px;
+  flex: 0 0 100%;*/
+  flex: 0 0 180px;     /* OCCUPA TUTTA LA RIGA */
+  margin-top: 20px;
+}
+
+.flex-break {
+  flex: 0 0 100%;
+  height: 0;
 }
 
 .header-label {
@@ -124,7 +141,11 @@ button:disabled {
 }
 
 .table-container {
-  flex: 1;
+  /*flex: 1; 
+  flex: 0 0 calc((100% - 4 * 16px) / 6); */
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .result-table td {
