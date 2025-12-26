@@ -18,6 +18,7 @@ client_id = env.get('client_id')
 shared_secret = env.get('shared_secret')
 tenant_id = env.get('tenant_id')
 
+
 def load_logbook(file_name: str = "Record.xlsm"):
     """Scarica il file da SharePoint e carica il logbook."""
 
@@ -50,6 +51,13 @@ def load_logbook(file_name: str = "Record.xlsm"):
         "status": status
     }
 
+def read_logbook(file_path: str,sheet_name: str = "Log Book"):
+    data_container = Data()
+    lgbk = data_container.load_file(
+        file_path,
+        sheet_name
+    )
+    return lgbk
 
 def convert_to_serializable(obj):
     if isinstance(obj, (str, int, float, bool, type(None))):
@@ -62,7 +70,13 @@ def convert_to_serializable(obj):
         return convert_to_serializable(obj.__dict__)
     return str(obj)
 
-
+def is_cache_valid(path: str, max_age_minutes: int) -> bool:
+    if not os.path.exists(path):
+        return False
+    file_mod_time = datetime.fromtimestamp(os.path.getmtime(path))
+    if datetime.now() - file_mod_time > timedelta(minutes=max_age_minutes):
+        return False
+    return True
 
 def run(mode: str, value: dict):
 
@@ -107,11 +121,31 @@ def run(mode: str, value: dict):
 
     
 def run_status():
-
-    logbook_output = load_logbook()
-    status = logbook_output["status"]
+    if not is_cache_valid(os.path.dirname(__file__) + "/"+"Record.xlsm", 60):
+        logbook_output = load_logbook()
+        status = logbook_output["status"]
+    else: 
+        status = read_logbook(os.path.dirname(__file__) + "/"+"Record.xlsm","StatusByDay")
+    
     
     today_date = datetime.today().date()
-    status = status[status.iloc[:,4] == pd.to_datetime(today_date,format="%Y-%m-%d")]
-    status = status.to_dict(orient='records')
-    return status
+    status = status.iloc[4:, 3:13]
+    status.columns = ['ID','Data','Slot','FMS1','FMS2','PTT1','PTT2','PTT3','ULTD1','ULTD2']
+    status = status.reset_index(drop=True)
+    print(status)
+    status['Data'] = pd.to_datetime(status['Data'], errors='coerce')
+
+    search_date = datetime.today().date()
+    max_days_back = 7
+
+    for _ in range(max_days_back):
+        mask = status['Data'].dt.date == search_date
+        if mask.any():
+            status = status.loc[mask]
+            return status.to_dict(orient='records')
+        search_date -= timedelta(days=1)
+
+    return []
+    #status = status[status.iloc[:,1] == pd.to_datetime(today_date,format="%Y-%m-%d")]
+    
+    
